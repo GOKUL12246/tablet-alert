@@ -24,6 +24,13 @@ async def lifespan(app: FastAPI):
     # Startup: ensure tables exist and start background scheduler
     logger.info("Initializing database tables...")
     Base.metadata.create_all(bind=engine)
+    try:
+        import seed_data
+        seed_data.seed_database()
+        logger.info("Default seed database verified.")
+    except Exception as e:
+        logger.info(f"Database seed skipped: {e}")
+
     if not os.environ.get("TESTING"):
         logger.info("Starting background scheduler...")
         start_scheduler()
@@ -44,10 +51,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS Middleware
+# CORS Middleware - configured for Vercel deployments and local testing
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if settings.DEMO_MODE else settings.CORS_ORIGINS,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

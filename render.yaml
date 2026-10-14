@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: tablet-alert-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: APP_NAME
+        value: "MEDISAKHI AI"
+      - key: DEMO_MODE
+        value: "true"
+      - key: DATABASE_URL
+        value: "sqlite:///./medisakhi.db"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+      - key: GMAIL_SENDER
+        value: "g17670714@gmail.com"
+      - key: GMAIL_APP_PASSWORD
+        value: "hexe syjd dfyv wbal"
+      - key: GMAIL_RECEIVER
+        value: "g17670714@gmail.com"
+      - key: TWILIO_SID
+        value: "ACf93bf342b2329038428531fc5433950a"
+      - key: TWILIO_AUTH_TOKEN
+        value: "b82ed646f75d652e60ffbb2e2dcae601"
+      - key: TWILIO_NUMBER
+        value: "+19787966432"
+      - key: CARETAKER_PHONE
+        value: "+916369067138"
