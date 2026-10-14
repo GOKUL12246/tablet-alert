@@ -1,0 +1,12 @@
+# Backend Git Ignore
+.env
+*.env
+!.env.example
+__pycache__/
+*.py[cod]
+*.db
+*.sqlite
+*.sqlite3
+.pytest_cache/
+venv/
+.venv/

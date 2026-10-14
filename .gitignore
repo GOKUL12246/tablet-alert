@@ -1,0 +1,48 @@
+# ============================================================
+# MEDISAKHI AI - Git Ignore Configuration
+# ============================================================
+
+# Environment variables & API credentials (NEVER commit secrets!)
+.env
+.env.*
+!.env.example
+*.env
+
+# Python compilation and caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Node / Frontend build artifacts
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+dist-ssr/
+*.local
+
+# Testing, logs & caches
+.pytest_cache/
+backend/.pytest_cache/
+.coverage
+htmlcov/
+*.log
+logs/
+
+# IDE & Editor files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tsbuildinfo

@@ -1,0 +1,75 @@
+version: '3.9'
+
+services:
+  # ─────────────────────────────────────────────────────────────
+  # PostgreSQL Database
+  # ─────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: medisakhi_db
+      POSTGRES_USER: medisakhi_user
+      POSTGRES_PASSWORD: medisakhi_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medisakhi_user -d medisakhi_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────────────────────────
+  # FastAPI Backend
+  # ─────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://medisakhi_user:medisakhi_password@db:5432/medisakhi_db
+      SECRET_KEY: ${SECRET_KEY:-change-this-in-production}
+      DEMO_MODE: ${DEMO_MODE:-true}
+      AI_PROVIDER: ${AI_PROVIDER:-demo}
+      SMS_PROVIDER: ${SMS_PROVIDER:-demo}
+      OCR_PROVIDER: ${OCR_PROVIDER:-demo}
+    volumes:
+      - ./backend:/app
+      - uploads_data:/app/uploads
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "
+        alembic upgrade head &&
+        python seed_data.py &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+
+  # ─────────────────────────────────────────────────────────────
+  # React Frontend (dev server)
+  # ─────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:8000/api/v1
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    command: npm run dev -- --host 0.0.0.0
+
+volumes:
+  postgres_data:
+  uploads_data:
